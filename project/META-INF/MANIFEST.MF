@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Class-Path: scala-library-2.10.2.jar control-0.13.5.jar scala-reflect.
+ jar classfile-0.13.5.jar sbinary_2.10-0.4.2.jar test-agent-0.13.5.jar
+  compile-0.13.5.jar process-0.13.5.jar task-system-0.13.5.jar scala-l
+ ibrary.jar io-0.13.5.jar ivy-2.3.0.jar actions-0.13.5.jar classpath-0
+ .13.5.jar compiler-ivy-integration-0.13.5.jar run-0.13.5.jar completi
+ on-0.13.5.jar jansi.jar cache-0.13.5.jar incremental-compiler-0.13.5.
+ jar ivy-0.13.5.jar test-interface-1.0.jar launcher-interface-0.13.5.j
+ ar jline-2.11.jar command-0.13.5.jar collections-0.13.5.jar jsch-0.1.
+ 46.jar cross-0.13.5.jar api-0.13.5.jar relation-0.13.5.jar tracking-0
+ .13.5.jar scala-compiler.jar logic-0.13.5.jar sbt-0.13.5.jar scala-re
+ flect-2.10.4.jar persist-0.13.5.jar apply-macro-0.13.5.jar main-0.13.
+ 5.jar tasks-0.13.5.jar compiler-integration-0.13.5.jar main-settings-
+ 0.13.5.jar jline.jar logging-0.13.5.jar interface-0.13.5.jar testing-
+ 0.13.5.jar
+

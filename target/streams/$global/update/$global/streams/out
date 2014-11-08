@@ -1,0 +1,136 @@
+[info] Updating {file:/home/wayneyu/scala/FunBot/}funbot...
+[debug] :: resolving dependencies :: funbot#funbot_2.9.2;1.0
+[debug] 	confs: [compile, runtime, test, provided, optional, compile-internal, runtime-internal, test-internal, plugin, sources, docs, pom, scala-tool]
+[debug] 	validate = true
+[debug] 	refresh = false
+[debug] resolving dependencies for configuration 'compile'
+[debug] == resolving dependencies for funbot#funbot_2.9.2;1.0 [compile]
+[debug] == resolving dependencies funbot#funbot_2.9.2;1.0->org.scala-lang#scala-library;2.9.2 [compile->default(compile)]
+[info] Resolving org.scala-lang#scala-library;2.9.2 ...
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@7e036dba
+[debug] sbt-chain: module revision found in cache: org.scala-lang#scala-library;2.9.2
+[debug] 	local: revision in cache: org.scala-lang#scala-library;2.9.2
+[debug] 	found org.scala-lang#scala-library;2.9.2 in sbt-chain
+[debug] == resolving dependencies funbot#funbot_2.9.2;1.0->org.scala-lang#scala-library;2.9.2 [compile->runtime]
+[debug] == resolving dependencies funbot#funbot_2.9.2;1.0->org.scala-lang#scala-library;2.9.2 [compile->compile]
+[debug] == resolving dependencies funbot#funbot_2.9.2;1.0->org.scala-lang#scala-library;2.9.2 [compile->master]
+[debug] resolving dependencies for configuration 'runtime'
+[debug] == resolving dependencies for funbot#funbot_2.9.2;1.0 [runtime]
+[debug] == resolving dependencies for funbot#funbot_2.9.2;1.0 [compile]
+[debug] == resolving dependencies funbot#funbot_2.9.2;1.0->org.scala-lang#scala-library;2.9.2 [compile->default(compile)]
+[debug] == resolving dependencies funbot#funbot_2.9.2;1.0->org.scala-lang#scala-library;2.9.2 [compile->runtime]
+[debug] == resolving dependencies funbot#funbot_2.9.2;1.0->org.scala-lang#scala-library;2.9.2 [compile->compile]
+[debug] == resolving dependencies funbot#funbot_2.9.2;1.0->org.scala-lang#scala-library;2.9.2 [compile->master]
+[debug] resolving dependencies for configuration 'test'
+[debug] == resolving dependencies for funbot#funbot_2.9.2;1.0 [test]
+[debug] == resolving dependencies for funbot#funbot_2.9.2;1.0 [runtime]
+[debug] == resolving dependencies for funbot#funbot_2.9.2;1.0 [compile]
+[debug] == resolving dependencies funbot#funbot_2.9.2;1.0->org.scala-lang#scala-library;2.9.2 [compile->default(compile)]
+[debug] == resolving dependencies funbot#funbot_2.9.2;1.0->org.scala-lang#scala-library;2.9.2 [compile->runtime]
+[debug] == resolving dependencies funbot#funbot_2.9.2;1.0->org.scala-lang#scala-library;2.9.2 [compile->compile]
+[debug] == resolving dependencies funbot#funbot_2.9.2;1.0->org.scala-lang#scala-library;2.9.2 [compile->master]
+[debug] resolving dependencies for configuration 'provided'
+[debug] == resolving dependencies for funbot#funbot_2.9.2;1.0 [provided]
+[debug] resolving dependencies for configuration 'optional'
+[debug] == resolving dependencies for funbot#funbot_2.9.2;1.0 [optional]
+[debug] resolving dependencies for configuration 'compile-internal'
+[debug] == resolving dependencies for funbot#funbot_2.9.2;1.0 [compile-internal]
+[debug] == resolving dependencies for funbot#funbot_2.9.2;1.0 [compile]
+[debug] == resolving dependencies funbot#funbot_2.9.2;1.0->org.scala-lang#scala-library;2.9.2 [compile->default(compile)]
+[debug] == resolving dependencies funbot#funbot_2.9.2;1.0->org.scala-lang#scala-library;2.9.2 [compile->runtime]
+[debug] == resolving dependencies funbot#funbot_2.9.2;1.0->org.scala-lang#scala-library;2.9.2 [compile->compile]
+[debug] == resolving dependencies funbot#funbot_2.9.2;1.0->org.scala-lang#scala-library;2.9.2 [compile->master]
+[debug] == resolving dependencies for funbot#funbot_2.9.2;1.0 [optional]
+[debug] == resolving dependencies for funbot#funbot_2.9.2;1.0 [provided]
+[debug] resolving dependencies for configuration 'runtime-internal'
+[debug] == resolving dependencies for funbot#funbot_2.9.2;1.0 [runtime-internal]
+[debug] == resolving dependencies for funbot#funbot_2.9.2;1.0 [runtime]
+[debug] == resolving dependencies for funbot#funbot_2.9.2;1.0 [compile]
+[debug] == resolving dependencies funbot#funbot_2.9.2;1.0->org.scala-lang#scala-library;2.9.2 [compile->default(compile)]
+[debug] == resolving dependencies funbot#funbot_2.9.2;1.0->org.scala-lang#scala-library;2.9.2 [compile->runtime]
+[debug] == resolving dependencies funbot#funbot_2.9.2;1.0->org.scala-lang#scala-library;2.9.2 [compile->compile]
+[debug] == resolving dependencies funbot#funbot_2.9.2;1.0->org.scala-lang#scala-library;2.9.2 [compile->master]
+[debug] == resolving dependencies for funbot#funbot_2.9.2;1.0 [optional]
+[debug] resolving dependencies for configuration 'test-internal'
+[debug] == resolving dependencies for funbot#funbot_2.9.2;1.0 [test-internal]
+[debug] == resolving dependencies for funbot#funbot_2.9.2;1.0 [test]
+[debug] == resolving dependencies for funbot#funbot_2.9.2;1.0 [runtime]
+[debug] == resolving dependencies for funbot#funbot_2.9.2;1.0 [compile]
+[debug] == resolving dependencies funbot#funbot_2.9.2;1.0->org.scala-lang#scala-library;2.9.2 [compile->default(compile)]
+[debug] == resolving dependencies funbot#funbot_2.9.2;1.0->org.scala-lang#scala-library;2.9.2 [compile->runtime]
+[debug] == resolving dependencies funbot#funbot_2.9.2;1.0->org.scala-lang#scala-library;2.9.2 [compile->compile]
+[debug] == resolving dependencies funbot#funbot_2.9.2;1.0->org.scala-lang#scala-library;2.9.2 [compile->master]
+[debug] == resolving dependencies for funbot#funbot_2.9.2;1.0 [optional]
+[debug] == resolving dependencies for funbot#funbot_2.9.2;1.0 [provided]
+[debug] resolving dependencies for configuration 'plugin'
+[debug] == resolving dependencies for funbot#funbot_2.9.2;1.0 [plugin]
+[debug] resolving dependencies for configuration 'sources'
+[debug] == resolving dependencies for funbot#funbot_2.9.2;1.0 [sources]
+[debug] resolving dependencies for configuration 'docs'
+[debug] == resolving dependencies for funbot#funbot_2.9.2;1.0 [docs]
+[debug] resolving dependencies for configuration 'pom'
+[debug] == resolving dependencies for funbot#funbot_2.9.2;1.0 [pom]
+[debug] resolving dependencies for configuration 'scala-tool'
+[debug] == resolving dependencies for funbot#funbot_2.9.2;1.0 [scala-tool]
+[debug] == resolving dependencies funbot#funbot_2.9.2;1.0->org.scala-lang#scala-compiler;2.9.2 [scala-tool->default]
+[info] Resolving org.scala-lang#scala-compiler;2.9.2 ...
+[debug] sbt-chain: Checking cache for: dependency: org.scala-lang#scala-compiler;2.9.2 {scala-tool=[default, optional(default)]}
+[debug] sbt-chain: module revision found in cache: org.scala-lang#scala-compiler;2.9.2
+[debug] 	local: revision in cache: org.scala-lang#scala-compiler;2.9.2
+[debug] 	found org.scala-lang#scala-compiler;2.9.2 in sbt-chain
+[debug] == resolving dependencies funbot#funbot_2.9.2;1.0->org.scala-lang#scala-compiler;2.9.2 [scala-tool->runtime]
+[debug] == resolving dependencies funbot#funbot_2.9.2;1.0->org.scala-lang#scala-compiler;2.9.2 [scala-tool->compile]
+[debug] == resolving dependencies org.scala-lang#scala-compiler;2.9.2->org.scala-lang#scala-library;2.9.2 [compile->master(*)]
+[debug] == resolving dependencies org.scala-lang#scala-compiler;2.9.2->org.scala-lang#scala-library;2.9.2 [compile->compile(*)]
+[debug] == resolving dependencies org.scala-lang#scala-compiler;2.9.2->org.scala-lang#scala-library;2.9.2 [compile->default]
+[debug] == resolving dependencies org.scala-lang#scala-compiler;2.9.2->org.scala-lang#scala-library;2.9.2 [compile->runtime]
+[debug] == resolving dependencies org.scala-lang#scala-compiler;2.9.2->org.scala-lang#scala-library;2.9.2 [compile->compile]
+[debug] == resolving dependencies org.scala-lang#scala-compiler;2.9.2->org.scala-lang#scala-library;2.9.2 [compile->master]
+[debug] == resolving dependencies org.scala-lang#scala-compiler;2.9.2->org.scala-lang#scala-library;2.9.2 [compile->runtime(*)]
+[debug] == resolving dependencies org.scala-lang#scala-compiler;2.9.2->org.scala-lang#scala-library;2.9.2 [compile->compile]
+[debug] == resolving dependencies org.scala-lang#scala-compiler;2.9.2->org.scala-lang#scala-library;2.9.2 [compile->optional(default)]
+[debug] == resolving dependencies org.scala-lang#scala-compiler;2.9.2->org.scala-lang#scala-library;2.9.2 [runtime->runtime(*)]
+[debug] == resolving dependencies org.scala-lang#scala-compiler;2.9.2->org.scala-lang#scala-library;2.9.2 [runtime->compile]
+[debug] == resolving dependencies funbot#funbot_2.9.2;1.0->org.scala-lang#scala-compiler;2.9.2 [scala-tool->master]
+[debug] == resolving dependencies funbot#funbot_2.9.2;1.0->org.scala-lang#scala-compiler;2.9.2 [scala-tool->optional(default)]
+[debug] == resolving dependencies org.scala-lang#scala-compiler;2.9.2->org.scala-lang#jline;2.9.2 [optional->master(*)]
+[info] Resolving org.scala-lang#jline;2.9.2 ...
+[debug] sbt-chain: Checking cache for: dependency: org.scala-lang#jline;2.9.2 {optional=[compile(*), master(*)]}
+[debug] sbt-chain: module revision found in cache: org.scala-lang#jline;2.9.2
+[debug] 	local: revision in cache: org.scala-lang#jline;2.9.2
+[debug] 	found org.scala-lang#jline;2.9.2 in sbt-chain
+[debug] == resolving dependencies org.scala-lang#scala-compiler;2.9.2->org.scala-lang#jline;2.9.2 [optional->compile(*)]
+[debug] == resolving dependencies org.scala-lang#jline;2.9.2->org.fusesource.jansi#jansi;1.4 [compile->master(*)]
+[info] Resolving org.fusesource.jansi#jansi;1.4 ...
+[debug] sbt-chain: Checking cache for: dependency: org.fusesource.jansi#jansi;1.4 {compile=[compile(*), master(*)], runtime=[runtime(*)]}
+[debug] sbt-chain: module revision found in cache: org.fusesource.jansi#jansi;1.4
+[debug] 	local: revision in cache: org.fusesource.jansi#jansi;1.4
+[debug] 	found org.fusesource.jansi#jansi;1.4 in sbt-chain
+[debug] == resolving dependencies org.scala-lang#jline;2.9.2->org.fusesource.jansi#jansi;1.4 [compile->compile(*)]
+[debug] == resolving dependencies funbot#funbot_2.9.2;1.0->org.scala-lang#scala-library;2.9.2 [scala-tool->default]
+[debug] == resolving dependencies funbot#funbot_2.9.2;1.0->org.scala-lang#scala-library;2.9.2 [scala-tool->runtime]
+[debug] == resolving dependencies funbot#funbot_2.9.2;1.0->org.scala-lang#scala-library;2.9.2 [scala-tool->compile]
+[debug] == resolving dependencies funbot#funbot_2.9.2;1.0->org.scala-lang#scala-library;2.9.2 [scala-tool->master]
+[debug] == resolving dependencies funbot#funbot_2.9.2;1.0->org.scala-lang#scala-library;2.9.2 [scala-tool->optional(default)]
+[debug] 	resolved ivy file produced in cache
+[debug] :: downloading artifacts ::
+[debug] 	[NOT REQUIRED] org.scala-lang#scala-library;2.9.2!scala-library.jar
+[debug] 	[NOT REQUIRED] org.scala-lang#scala-compiler;2.9.2!scala-compiler.jar
+[debug] 	[NOT REQUIRED] org.scala-lang#jline;2.9.2!jline.jar
+[debug] 	[NOT REQUIRED] org.fusesource.jansi#jansi;1.4!jansi.jar
+[debug] :: resolution report :: resolve 355ms :: artifacts dl 10ms
+[debug] 	report for funbot#funbot_2.9.2;1.0 compile produced in /home/wayneyu/scala/FunBot/target/resolution-cache/reports/funbot-funbot_2.9.2-compile.xml
+[debug] 	report for funbot#funbot_2.9.2;1.0 runtime produced in /home/wayneyu/scala/FunBot/target/resolution-cache/reports/funbot-funbot_2.9.2-runtime.xml
+[debug] 	report for funbot#funbot_2.9.2;1.0 test produced in /home/wayneyu/scala/FunBot/target/resolution-cache/reports/funbot-funbot_2.9.2-test.xml
+[debug] 	report for funbot#funbot_2.9.2;1.0 provided produced in /home/wayneyu/scala/FunBot/target/resolution-cache/reports/funbot-funbot_2.9.2-provided.xml
+[debug] 	report for funbot#funbot_2.9.2;1.0 optional produced in /home/wayneyu/scala/FunBot/target/resolution-cache/reports/funbot-funbot_2.9.2-optional.xml
+[debug] 	report for funbot#funbot_2.9.2;1.0 compile-internal produced in /home/wayneyu/scala/FunBot/target/resolution-cache/reports/funbot-funbot_2.9.2-compile-internal.xml
+[debug] 	report for funbot#funbot_2.9.2;1.0 runtime-internal produced in /home/wayneyu/scala/FunBot/target/resolution-cache/reports/funbot-funbot_2.9.2-runtime-internal.xml
+[debug] 	report for funbot#funbot_2.9.2;1.0 test-internal produced in /home/wayneyu/scala/FunBot/target/resolution-cache/reports/funbot-funbot_2.9.2-test-internal.xml
+[debug] 	report for funbot#funbot_2.9.2;1.0 plugin produced in /home/wayneyu/scala/FunBot/target/resolution-cache/reports/funbot-funbot_2.9.2-plugin.xml
+[debug] 	report for funbot#funbot_2.9.2;1.0 sources produced in /home/wayneyu/scala/FunBot/target/resolution-cache/reports/funbot-funbot_2.9.2-sources.xml
+[debug] 	report for funbot#funbot_2.9.2;1.0 docs produced in /home/wayneyu/scala/FunBot/target/resolution-cache/reports/funbot-funbot_2.9.2-docs.xml
+[debug] 	report for funbot#funbot_2.9.2;1.0 pom produced in /home/wayneyu/scala/FunBot/target/resolution-cache/reports/funbot-funbot_2.9.2-pom.xml
+[debug] 	report for funbot#funbot_2.9.2;1.0 scala-tool produced in /home/wayneyu/scala/FunBot/target/resolution-cache/reports/funbot-funbot_2.9.2-scala-tool.xml
+[debug] 	resolve done (355ms resolve - 10ms download)
+[info] Done updating.
