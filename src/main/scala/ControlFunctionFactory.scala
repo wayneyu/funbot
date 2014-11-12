@@ -88,7 +88,7 @@ object ControlFunction
     directionValue(XY.fromDirection45(lastDirection).negate.toDirection45) -= 10 // unfavor going backward
 
     // back to master if master is nearby by favoring direction of master
-    if ( bot.energy > 1000 && bot.offsetToMaster.stepCount <= 3 ||
+    if ( bot.energy > 500 && bot.offsetToMaster.stepCount <= 3 ||
       (apocalypse - 100 - bot.time < bot.offsetToMaster.stepCount))
       directionValue(bot.offsetToMaster.toDirection45) += 800
 
@@ -98,7 +98,7 @@ object ControlFunction
 
     bot.viewAnalyzer.enemyMaster match {
       case xy::xys => {
-        if (xy.stepCount < 3 && bot.viewAnalyzer.friendlySlave.size < 2) {
+        if (xy.stepCount < 3){ //&& damageByExploding > bot.energy + resourceValue && bot.viewAnalyzer.friendlySlave.size < 2) {
           bot.set("mood" -> "Aggressive")
         } else {
           //bot.set("mood" -> "Aggressive")
@@ -119,14 +119,16 @@ object ControlFunction
     val analyzer = bot.viewAnalyzer
     val resourceValue = analyzer.resourceValue
 
-    val blastRadius = 5
+    val blastRadius = 3
     val damageByExploding = ( for {
       d <- analyzer.enemyDistances
-    } yield bot.calcExplodeDamage(blastRadius,d)).sum
+    } yield bot.calcExplodeDamage(blastRadius, d, 150)).sum
+
+
 
     analyzer.enemyMaster match {
       case xy::xys =>
-        if(xy.length <= 2) {// && analyzer.nnearestFriendlySlave < 2){// && damageByExploding > bot.energy + resourceValue) {
+        if(xy.length <= 2 && damageByExploding > bot.energy + resourceValue) {// && analyzer.nnearestFriendlySlave < 2){// && damageByExploding > bot.energy + resourceValue) {
           //bot.status(damageByExploding.toString + " " + (bot.energy + resourceValue).toString())
           bot.explode(blastRadius)
           //bot.spawn(unitDelta, "mood" -> "Aggressive", "target" -> remainder)
@@ -433,13 +435,12 @@ trait Bot {
 trait MiniBot extends Bot {
   // inputs
   def offsetToMaster: XY
-  def calcExplodeDamage(blastRadius: Int, distFromCenter: Double) = {
+  def calcExplodeDamage(blastRadius: Int, distFromCenter: Double, maxDamage: Int) = {
     val blastArea = blastRadius*blastRadius*3.141
     val energyPerArea = energy/blastArea
     val damageAtCenter = energyPerArea*200
     val damage = damageAtCenter*(if (distFromCenter >= blastRadius) 0 else (1-distFromCenter/blastRadius))
-    val maxDamageEst = 150.0
-    if (damage > maxDamageEst) maxDamageEst else damage
+    if (damage > maxDamage) maxDamage.toDouble else damage
   }
   def mood: Mood
 
@@ -510,6 +511,12 @@ class MiniBotImpl(inputParams: Map[String, String]) extends BotImpl(inputParams:
     case "Defensive" => Defensive
     case s: String => Gathering
   }
+  val blastRadius = 2
+  def damageByExploding = ( for {
+    d <- viewAnalyzer.enemySlave
+  } yield calcExplodeDamage(blastRadius, d.length, 150)).sum
+
+
 
   def explode(blastRadius: Int) = append("Explode(size=" + blastRadius + ")")
 
