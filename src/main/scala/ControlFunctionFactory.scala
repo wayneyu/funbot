@@ -1,3 +1,4 @@
+import scala.collection.mutable.ListBuffer
 import util.Random
 
 /** This bot builds a 'direction value map' that assigns an attractiveness score to
@@ -6,11 +7,9 @@ import util.Random
   * - defensive missiles: approach an enemy slave and annihilate it
   *
   * The master bot uses the following state parameters:
-  *  - dontFireAggressiveMissileUntil
-  *  - dontFireDefensiveMissileUntil
   *  - lastDirection
   * The mini-bots use the following state parameters:
-  *  - mood = Aggressive | Defensive | Lurking
+  *  - mood = Aggressive | Defensive | Gathering
   *  - target = remaining offset to target location
   */
 object ControlFunction
@@ -19,8 +18,6 @@ object ControlFunction
 
     val directionValue = bot.viewAnalyzer.directionValue
     val lastDirection = bot.inputAsIntOrElse("lastDirection", 0)
-//    val dontFireAggressiveMissileUntil = bot.inputAsIntOrElse("dontFireAggressiveMissileUntil", -1)
-//    val dontFireDefensiveMissileUntil = bot.inputAsIntOrElse("dontFireDefensiveMissileUntil", -1)
 
     // determine movement direction
     directionValue(lastDirection) += 10 // try to break ties by favoring the last direction
@@ -28,41 +25,17 @@ object ControlFunction
 
     val bestDirection45 = directionValue.zipWithIndex.maxBy(_._1)._2
     val bestDirection = XY.fromDirection45(bestDirection45)
-    bot.move(bestDirection)
-    bot.set("lastDirection" -> bestDirection.toDirection45)
 
     val nchildren = bot.inputAsIntOrElse("nchildren", 0)
-    if (nchildren < 10 && bot.energy > 100){
-      bot.spawn(XY(1,0), "mood" -> "Gathering")
+    if (nchildren < 10 && bot.energy > 100) {
+      val spawnDirection = bestDirection.negate
+      bot.spawn(spawnDirection, "mood" -> "Gathering")
       bot.set("nchildren" -> (nchildren + 1) )
+      directionValue(spawnDirection.toDirection45) -= 10
     }
 
-    //bot.status(bot.inputOrElse("apocalypse","unknown"))
-
-//    if(dontFireAggressiveMissileUntil < bot.time && bot.energy > 100) { // fire attack missile?
-//      nearestEnemyMaster match {
-//        case None =>            // no-on nearby
-//        case Some(relPos) =>    // a master is nearby
-//          val unitDelta = relPos.signum
-//          val remainder = relPos - unitDelta // we place slave nearer target, so subtract that from overall delta
-//          bot.spawn(unitDelta, "mood" -> "Aggressive", "target" -> remainder)
-//          bot.set("dontFireAggressiveMissileUntil" -> (bot.time + relPos.stepCount + 1))
-//      }
-//    }
-//    else
-//    if(dontFireDefensiveMissileUntil < bot.time && bot.energy > 100) { // fire defensive missile?
-//      nearestEnemySlave match {
-//        case None =>            // no-on nearby
-//        case Some(relPos) =>    // an enemy slave is nearby
-//          if(relPos.stepCount < 8) {
-//            // this one's getting too close!
-//            val unitDelta = relPos.signum
-//            val remainder = relPos - unitDelta // we place slave nearer target, so subtract that from overall delta
-//            bot.spawn(unitDelta, "mood" -> "Defensive", "target" -> remainder)
-//            bot.set("dontFireDefensiveMissileUntil" -> (bot.time + relPos.stepCount + 1))
-//          }
-//      }
-//    }
+    bot.move(bestDirection)
+    bot.set("lastDirection" -> bestDirection.toDirection45)
   }
 
 
@@ -79,8 +52,7 @@ object ControlFunction
   def reactAsGatherer(bot: MiniBot) {
 
     val directionValue = bot.viewAnalyzer.directionValue
-    val friendlySlave = bot.viewAnalyzer.friendlySlave
-    val apocalypse = 5000//bot.inputAsIntOrElse("apocalypse",1000)
+    val apocalypse = bot.inputAsIntOrElse("apocalypse",5000)
 
     // determine movement direction
     val lastDirection = bot.inputAsIntOrElse("lastDirection", 0)
@@ -89,29 +61,68 @@ object ControlFunction
 
     // back to master if master is nearby by favoring direction of master
     if ( bot.energy > 500 && bot.offsetToMaster.stepCount <= 3 ||
-      (apocalypse - 100 - bot.time < bot.offsetToMaster.stepCount))
-      directionValue(bot.offsetToMaster.toDirection45) += 800
+      (apocalypse - 140 - bot.time < bot.offsetToMaster.stepCount))
+      directionValue(bot.offsetToMaster.toDirection45) += 500
 
-    // spawn new gatherer if surrounding doesn't have enough of minibots
-    if ( friendlySlave.size*3+1 < 2)
-        bot.spawn(XY(1,0), "mood" -> "Gathering")
-
-    bot.viewAnalyzer.enemyMaster match {
-      case xy::xys => {
-        if (xy.stepCount < 3){ //&& damageByExploding > bot.energy + resourceValue && bot.viewAnalyzer.friendlySlave.size < 2) {
-          bot.set("mood" -> "Aggressive")
+    // favor the food that no other friendly slave is closer too
+    val siblings = bot.viewAnalyzer.S
+    val fluppets = bot.viewAnalyzer.B
+    if ( fluppets.nonEmpty && siblings.nonEmpty ) {
+      for (xy <- fluppets.sortBy(_.length)) {
+        val closestSiblingToFluppet = siblings.map(_.distanceTo(xy)).sorted.head
+        if (closestSiblingToFluppet < xy.length) {
+          // remove the point for the fluppet
+          directionValue(xy.toDirection45) -= {
+            val steps = xy.stepCount
+            if(steps == 1) 600
+            else if(steps == 2) 400
+            else (430 - steps * 15).max(10)
+          }
         } else {
-          //bot.set("mood" -> "Aggressive")
+          directionValue(xy.toDirection45) += 500
         }
       }
+    }
+    val zugars = bot.viewAnalyzer.P
+    if ( zugars.nonEmpty && siblings.nonEmpty ) {
+      for (xy <- zugars.sortBy(_.length)) {
+        val closestSiblingToZugars = siblings.map(_.distanceTo(xy)).sorted.head
+        if (closestSiblingToZugars < xy.length) {
+          // remove the point for the zugar
+          directionValue(xy.toDirection45) -= {
+            val steps = xy.stepCount
+            if(steps == 1) 500
+            else if(steps == 2) 300
+            else (320 - steps * 10).max(10)
+          }
+        } else {
+          directionValue(xy.toDirection45) += 500
+        }
+      }
+    }
+
+
+    val badXYs = (bot.viewAnalyzer.m ++
+          bot.viewAnalyzer.s ++
+          bot.viewAnalyzer.b)
+
+    badXYs match {
+      case x :: xs =>
+//        if (x.stepCount < 3)
+          //bot.set("mood" -> "Aggressive")
       case Nil =>
     }
 
     val bestDirection45 = directionValue.zipWithIndex.maxBy(_._1)._2
     val bestDirection = XY.fromDirection45(bestDirection45)
 
+    // spawn new gatherer if the surrounding lacks minibots
+    if ( siblings.size*3+1 < 2)
+        bot.spawn(bestDirection.negate, "mood" -> "Gathering")
+
     bot.move(bestDirection)
     bot.set("lastDirection" -> bestDirection.toDirection45)
+
   }
 
   def reactAsAggressiveMissile(bot: MiniBot) {
@@ -120,97 +131,22 @@ object ControlFunction
     val resourceValue = analyzer.resourceValue
 
     val blastRadius = 3
-    val damageByExploding = ( for {
-      d <- analyzer.enemyDistances
-    } yield bot.calcExplodeDamage(blastRadius, d, 150)).sum
+    val damageByExploding =
+      ( for { d <- analyzer.b } yield bot.calcExplodeDamage(blastRadius, d.length, 150)).sum +
+      ( for { d <- analyzer.s } yield bot.calcExplodeDamage(blastRadius, d.length, 300)).sum +
+      ( for { d <- analyzer.m } yield bot.calcExplodeDamage(blastRadius, d.length, 1000)).sum
 
-
-
-    analyzer.enemyMaster match {
-      case xy::xys =>
-        if(xy.length <= 2 && damageByExploding > bot.energy + resourceValue) {// && analyzer.nnearestFriendlySlave < 2){// && damageByExploding > bot.energy + resourceValue) {
-          //bot.status(damageByExploding.toString + " " + (bot.energy + resourceValue).toString())
-          bot.explode(blastRadius)
-          //bot.spawn(unitDelta, "mood" -> "Aggressive", "target" -> remainder)
-          //bot.set("dontFireDefensiveMissileUntil" -> (bot.time + relPos.stepCount + 1))
-        } else {
-          bot.set("mood" -> "Gathering")
-        }
-      case Nil =>
-        bot.set("mood" -> "Gathering")
+    if( damageByExploding > bot.energy + resourceValue ) {// && analyzer.nnearestFriendlySlave < 2){// && damageByExploding > bot.energy + resourceValue) {
+      bot.explode(blastRadius)
+    } else {
+      bot.set("mood" -> "Gathering")
+//      reactAsGatherer(bot)
     }
 
-//    if ( damageByExploding > bot.energy + resourceValue ) {
-//      bot.status(damageByExploding.toString + " " + (bot.energy + resourceValue).toString())
-//      bot.explode(blastRadius)
-//    } else {
-//      //move closer
-//
-//    }
-
-//    bot.view.offsetToNearest('m') match {
-//      case Some(delta: XY) =>
-//        // another master is visible at the given relative position (i.e. position delta)
-//
-//        // close enough to blow it up?
-//        if(delta.length <= 2) {
-//          // yes -- blow it up!
-//          bot.explode(4)
-//
-//        } else {
-//          // no -- move closer!
-//          bot.move(delta.signum)
-//          bot.set("rx" -> delta.x, "ry" -> delta.y)
-//        }
-//      case None =>
-//        // no target visible -- follow our targeting strategy
-//        val target = bot.inputAsXYOrElse("target", XY.Zero)
-//
-//        // did we arrive at the target?
-//        if(target.isNonZero) {
-//          // no -- keep going
-//          val unitDelta = target.signum // e.g. CellPos(-8,6) => CellPos(-1,1)
-//          bot.move(unitDelta)
-//
-//          // compute the remaining delta and encode it into a new 'target' property
-//          val remainder = target - unitDelta // e.g. = CellPos(-7,5)
-//          bot.set("target" -> remainder)
-//        } else {
-//          // yes -- but we did not detonate yet, and are not pursuing anything?!? => switch purpose
-//          bot.set("mood" -> "Lurking", "target" -> "")
-//          bot.say("Lurking")
-//        }
-//    }
   }
 
 
   def reactAsDefensiveMissile(bot: MiniBot) {
-//    bot.view.offsetToNearest('s') match {
-//      case Some(delta: XY) =>
-//        // another slave is visible at the given relative position (i.e. position delta)
-//        // move closer!
-//        bot.move(delta.signum)
-//        bot.set("rx" -> delta.x, "ry" -> delta.y)
-//
-//      case None =>
-//        // no target visible -- follow our targeting strategy
-//        val target = bot.inputAsXYOrElse("target", XY.Zero)
-//
-//        // did we arrive at the target?
-//        if(target.isNonZero) {
-//          // no -- keep going
-//          val unitDelta = target.signum // e.g. CellPos(-8,6) => CellPos(-1,1)
-//          bot.move(unitDelta)
-//
-//          // compute the remaining delta and encode it into a new 'target' property
-//          val remainder = target - unitDelta // e.g. = CellPos(-7,5)
-//          bot.set("target" -> remainder)
-//        } else {
-//          // yes -- but we did not annihilate yet, and are not pursuing anything?!? => switch purpose
-//          bot.set("mood" -> "Lurking", "target" -> "")
-//          bot.say("Lurking")
-//        }
-//    }
 
 
   }
@@ -220,16 +156,20 @@ object ControlFunction
 trait ViewAnalyzer{
   val directionValue: Array[Double]
   val resourceValue: Int
-  val enemyMaster: List[XY]
-  val enemySlave: List[XY]
-  val friendlySlave: List[XY]
-  val enemyDistances: List[Double]
+  val entityXYs: Map[Char,List[XY]]
+  def S = entityXYs.getOrElse('S', Nil)
+  def m = entityXYs.getOrElse('m', Nil)
+  def s = entityXYs.getOrElse('s', Nil)
+  def p = entityXYs.getOrElse('p', Nil)
+  def P = entityXYs.getOrElse('P', Nil)
+  def b = entityXYs.getOrElse('b', Nil)
+  def B = entityXYs.getOrElse('B', Nil)
+  def W = entityXYs.getOrElse('W', Nil)
 }
 
 case class viewAnalyzerSlave(view: View) extends ViewAnalyzer{
 
-  val (directionValue, resourceValue, enemyMaster, enemySlave,
-  friendlySlave, enemyDistances) = analyzeViewAsSlave(view)
+  val (directionValue, resourceValue, entityXYs) = analyzeViewAsSlave(view)
 
   /** Analyze the view, building a map of attractiveness for the 45-degree directions and
     * recording other relevant data, such as the nearest elements of various kinds.
@@ -237,47 +177,45 @@ case class viewAnalyzerSlave(view: View) extends ViewAnalyzer{
   def analyzeViewAsSlave(view: View) = {
     val directionValue = Array.ofDim[Double](8)
     var resourceValue = 0
-    var enemyMaster = scala.collection.mutable.ListBuffer[XY]()
-    var enemySlave = scala.collection.mutable.ListBuffer[XY]()
-    var friendlySlave = scala.collection.mutable.ListBuffer[XY]()
-    val enemyDistances = scala.collection.mutable.ListBuffer[Double]()
-
+    var entityXYs = Map[Char, scala.collection.mutable.ListBuffer[XY]]()
     val cells = view.cells
     val cellCount = cells.length
+
     for(i <- 0 until cellCount) {
       val cellRelPos = view.relPosFromIndex(i)
       if(cellRelPos.isNonZero) {
+        cells(i) match {
+          case '-' =>
+          case c: Char =>
+            entityXYs.get(c) match {
+              case Some(l) => l += cellRelPos
+              case None => entityXYs += (c -> ListBuffer[XY](cellRelPos))
+            }
+        }
         val stepDistance = cellRelPos.stepCount
-        val cellRelDist = cellRelPos.length
         val value: Double = cells(i) match {
           case 'm' => // another master: causes EU lost
-            enemyMaster += cellRelPos
-            enemyDistances += cellRelDist
             if(stepDistance < 10) -2000 else 0
 
           case 's' => // another slave: causes EU lost
-            enemySlave += cellRelPos
-            enemyDistances += cellRelDist
             if(stepDistance < 10) -2000 else 0
 
           case 'S' => // our own slave
-            friendlySlave += cellRelPos
             -100 // to spread out mini-bots
 
           case 'B' => // good beast: valuable, but runs away
             resourceValue += 200
             if(stepDistance == 1) 600
             else if(stepDistance == 2) 400
-            else (150 - stepDistance * 15).max(10)
+            else (430 - stepDistance * 15).max(10)
 
           case 'P' => // good plant: less valuable, but does not run
             resourceValue += 100
             if(stepDistance == 1) 500
             else if(stepDistance == 2) 300
-            else (150 - stepDistance * 10).max(10)
+            else (320 - stepDistance * 10).max(10)
 
           case 'b' => // bad beast: dangerous, but only if very close
-            enemyDistances += cellRelDist
             if(stepDistance < 4) -400 / stepDistance else -50 / stepDistance
 
           case 'p' => // bad plant: bad, but only if I step on it
@@ -294,15 +232,14 @@ case class viewAnalyzerSlave(view: View) extends ViewAnalyzer{
         directionValue(direction45) += value
       }
     }
-    (directionValue, resourceValue, enemyMaster.toList, enemySlave.toList, friendlySlave.toList, enemyDistances.toList)
+    (directionValue, resourceValue, entityXYs.map{ case (c, bl) => (c, bl.toList) })
   }
 
 }
 
 case class viewAnalyzerMaster(view: View) extends ViewAnalyzer {
 
-  val (directionValue, resourceValue, enemyMaster, enemySlave,
-  friendlySlave, enemyDistances) = analyzeViewAsMaster(view)
+  val (directionValue, resourceValue, entityXYs) = analyzeViewAsMaster(view)
   
   /** Analyze the view, building a map of attractiveness for the 45-degree directions and
     * recording other relevant data, such as the nearest elements of various kinds.
@@ -310,31 +247,30 @@ case class viewAnalyzerMaster(view: View) extends ViewAnalyzer {
   def analyzeViewAsMaster(view: View) = {
     val directionValue = Array.ofDim[Double](8)
     var resourceValue = 0
-    var enemyMaster = scala.collection.mutable.ListBuffer[XY]()
-    var enemySlave = scala.collection.mutable.ListBuffer[XY]()
-    var friendlySlave = scala.collection.mutable.ListBuffer[XY]()
-    val enemyDistances = scala.collection.mutable.ListBuffer[Double]()
+    var entityXYs = Map[Char, ListBuffer[XY]]()
 
     val cells = view.cells
     val cellCount = cells.length
     for(i <- 0 until cellCount) {
       val cellRelPos = view.relPosFromIndex(i)
       if(cellRelPos.isNonZero) {
+        cells(i) match {
+          case '-' =>
+          case c: Char =>
+            entityXYs.get(c) match {
+              case Some(l) => l += cellRelPos
+              case None => entityXYs += (c -> ListBuffer[XY](cellRelPos))
+            }
+        }
         val stepDistance = cellRelPos.stepCount
-        val cellRelDist = cellRelPos.length
         val value: Double = cells(i) match {
           case 'm' => // another master: not dangerous, but an obstacle
-            enemyMaster += cellRelPos
-            enemyDistances += cellRelDist
             if(stepDistance < 2) -1000 else 0
 
           case 's' => // another slave: potentially dangerous?
-            enemySlave += cellRelPos
-            enemyDistances += cellRelDist
             -100 / stepDistance
 
           case 'S' => // out own slave
-            friendlySlave += cellRelPos
             10
 
           case 'B' => // good beast: valuable, but runs away
@@ -350,7 +286,6 @@ case class viewAnalyzerMaster(view: View) extends ViewAnalyzer {
             else (150 - stepDistance * 10).max(10)
 
           case 'b' => // bad beast: dangerous, but only if very close
-            enemyDistances += cellRelDist
             if(stepDistance < 4) -400 / stepDistance else -50 / stepDistance
 
           case 'p' => // bad plant: bad, but only if I step on it
@@ -365,9 +300,10 @@ case class viewAnalyzerMaster(view: View) extends ViewAnalyzer {
         }
         val direction45 = cellRelPos.toDirection45
         directionValue(direction45) += value
+
       }
     }
-    (directionValue, resourceValue, enemyMaster.toList, enemySlave.toList, friendlySlave.toList, enemyDistances.toList)
+    (directionValue, resourceValue, entityXYs.map{ case (c, bl) => (c, bl.toList) })
   }
 
 }
@@ -378,30 +314,24 @@ case class viewAnalyzerMaster(view: View) extends ViewAnalyzer {
 // -------------------------------------------------------------------------------------------------
 
 class ControlFunctionFactory {
+  var globals = Map[String, String]()
+
   def create = (input: String) => {
     val (opcode, params) = CommandParser(input)
-    //var apocalypse = 0
     opcode match {
       case "Welcome" =>
-        //apocalypse = params("apocalypse").toInt
-        //""
-        //"Log(text=" + params.getOrElse("apocalypse","1000") + ")"
-        //val nsteps = params("apocalypse").toInt
-        //"Set(nsteps=" + nsteps + ")"
-        //"Log(text=adafda)"
+        globals = params
       case "React" =>
         val gen = params("generation").toInt
         if( gen == 0 ) {
-          val bot = new BotImpl(params)
+          val bot = new BotImpl(globals ++ params)
           ControlFunction.forMaster(bot)
-          //bot.set("apocalypse" -> apocalypse)
           bot.toString
         } else {
-          val bot = new MiniBotImpl(params)
+          val bot = new MiniBotImpl(globals ++ params)
           ControlFunction.forSlave(bot)
           bot.toString
         }
-
       case _ => "" // OK
     }
   }
@@ -513,10 +443,8 @@ class MiniBotImpl(inputParams: Map[String, String]) extends BotImpl(inputParams:
   }
   val blastRadius = 2
   def damageByExploding = ( for {
-    d <- viewAnalyzer.enemySlave
+    d <- viewAnalyzer.s
   } yield calcExplodeDamage(blastRadius, d.length, 150)).sum
-
-
 
   def explode(blastRadius: Int) = append("Explode(size=" + blastRadius + ")")
 

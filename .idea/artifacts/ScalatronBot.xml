@@ -1,6 +1,6 @@
 <component name="ArtifactManager">
   <artifact type="jar" build-on-make="true" name="ScalatronBot">
-    <output-path>$PROJECT_DIR$/../Scalatron/bots/funbot</output-path>
+    <output-path>$PROJECT_DIR$/../bots/funbot</output-path>
     <root id="archive" name="ScalatronBot.jar">
       <element id="module-output" name="funbot" />
     </root>

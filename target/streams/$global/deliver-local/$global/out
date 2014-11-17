@@ -1,4 +1,0 @@
-[0m[[0minfo[0m] [0m:: delivering :: funbot#funbot_2.10;1.0 :: 1.0 :: release :: Mon Nov 03 21:15:05 PST 2014[0m
-[0m[[0mdebug[0m] [0m	options = status=release pubdate=Mon Nov 03 21:15:05 PST 2014 validate=true resolveDynamicRevisions=true merge=true resolveId=null pubBranch=null[0m
-[0m[[0minfo[0m] [0m	delivering ivy file to /home/wayneyu/scala/FunBot/target/scala-2.10/ivy-1.0.xml[0m
-[0m[[0mdebug[0m] [0m	deliver done (39ms)[0m
