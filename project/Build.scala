@@ -21,7 +21,7 @@ object FunBotBuild extends Build {
     scalatronDir := file("/home/wayneyu/scala/Scalatron"),
     headless := false,
     steps := 5000,
-    maxSlaves := 650,
+    maxSlaves := 5000,
 
     play <<= (scalatronDir, name, javaOptions, Keys.`package` in Compile, headless, steps, maxSlaves) map {
       (base, name, javaOptions, botJar, headless, steps, maxSlaves) =>
