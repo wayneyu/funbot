@@ -54,7 +54,7 @@ object ControlFunction {
     val bestDirection45 = directionValue.zipWithIndex.maxBy(_._1)._2
     val bestDirection = XY.fromDirection45(bestDirection45)
 
-    if (bot.energy > 100 && bot.viewAnalyzer.S.size < 10) {
+    if (bot.energy > 500 && bot.viewAnalyzer.S.size < 10) {
       val spawnDirection = bestDirection.negate
       bot.spawn(spawnDirection, "mood" -> "Gathering")
       directionValue(spawnDirection.toDirection45) -= 10
@@ -133,7 +133,6 @@ object ControlFunction {
     // spawn new gatherer if the surrounding lacks minibots
     if ( siblings.size*3+1 < 2)
         bot.spawn(bestDirection.negate, "mood" -> "Gathering")
-//        bot.say("b")
 
     val badXYs = (bot.viewAnalyzer.m ++
           bot.viewAnalyzer.s).sortBy(_.length)// ++ bot.viewAnalyzer.b)
@@ -141,8 +140,7 @@ object ControlFunction {
     badXYs match {
       case x :: xs =>
         if (x.stepCount < 2) {
-          bot.spawn(x.negate, "energy" -> bot.energy, "mood" -> "Gathering")
-          bot.explode(2) // rather explode than get annihilated
+          reactAsDefensiveMissile(bot) // rather explode than get annihilated
         } else if (x.length < 10 )
           reactAsAggressiveMissile(bot)
       case Nil =>
@@ -178,8 +176,8 @@ object ControlFunction {
 
 
   def reactAsDefensiveMissile(bot: MiniBot) {
-
-
+    bot.spawn(XY(1,0), "energy" -> bot.energy, "mood" -> "Gathering")
+    bot.explode(2)
   }
 
 }
@@ -302,7 +300,7 @@ case class viewAnalyzerMaster(view: View) extends ViewAnalyzer {
             resourceValue += 150
             if(stepDistance == 1) 500
             else if(stepDistance == 2) 300
-            else (150 - stepDistance * 10).max(10)
+            else (320 - stepDistance * 10).max(10)
 
           case 'S' => // our own slave
             10
