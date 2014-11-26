@@ -54,7 +54,7 @@ object ControlFunction {
     val bestDirection45 = directionValue.zipWithIndex.maxBy(_._1)._2
     val bestDirection = XY.fromDirection45(bestDirection45)
 
-    if (bot.energy > 500 && bot.viewAnalyzer.S.size < 10) {
+    if (bot.energy > 100 && bot.viewAnalyzer.S.size < 10) {
       val spawnDirection = bestDirection.negate
       bot.spawn(spawnDirection, "mood" -> "Gathering")
       directionValue(spawnDirection.toDirection45) -= 10
@@ -86,7 +86,7 @@ object ControlFunction {
     directionValue(XY.fromDirection45(lastDirection).negate.toDirection45) -= 10 // unfavor going backward
 
     // back to master if master is nearby by favoring direction of master
-    if ( bot.energy > 500 && bot.offsetToMaster.stepCount <= 3 ||
+    if ( bot.energy > 500 && bot.offsetToMaster.stepCount <= 5 ||
       (apocalypse - 140 - bot.time < bot.offsetToMaster.stepCount))
       directionValue(bot.offsetToMaster.toDirection45) += 500
 
@@ -131,18 +131,22 @@ object ControlFunction {
     val bestDirection = XY.fromDirection45(bestDirection45)
 
     // spawn new gatherer if the surrounding lacks minibots
-    if ( siblings.size*3+1 < 2)
+    if ( siblings.size < 5 )
         bot.spawn(bestDirection.negate, "mood" -> "Gathering")
 
-    val badXYs = (bot.viewAnalyzer.m ++
-          bot.viewAnalyzer.s).sortBy(_.length)// ++ bot.viewAnalyzer.b)
-
-    badXYs match {
+    // react to enemy bots and beasts if they get to close
+    val enemybots = (bot.viewAnalyzer.m ++ bot.viewAnalyzer.s).sortBy(_.length)
+    val beasts = bot.viewAnalyzer.b.sortBy(_.length)
+    enemybots ++ beasts match {
       case x :: xs =>
-        if (x.stepCount < 2) {
+         if ( x.length < 10 )
+           reactAsAggressiveMissile(bot)
+      case Nil =>
+    }
+    enemybots match {
+      case x :: xs =>
+        if (x.stepCount < 2)
           reactAsDefensiveMissile(bot) // rather explode than get annihilated
-        } else if (x.length < 10 )
-          reactAsAggressiveMissile(bot)
       case Nil =>
     }
 
@@ -161,17 +165,16 @@ object ControlFunction {
 
     val blastRadius = 5
     val damageByExploding =
-      ( for { d <- analyzer.b } yield bot.calcExplodeDamage(blastRadius, d.length, 150)).sum +
-      ( for { d <- analyzer.s } yield bot.calcExplodeDamage(blastRadius, d.length, 200)).sum +
-      ( for { d <- analyzer.m } yield bot.calcExplodeDamage(blastRadius, d.length, 300)).sum
+      ( for { d <- analyzer.b } yield bot.calcExplodeDamage(blastRadius, d.length, 150)) ++
+      ( for { d <- analyzer.s } yield bot.calcExplodeDamage(blastRadius, d.length, 200)) ++
+      ( for { d <- analyzer.m } yield bot.calcExplodeDamage(blastRadius, d.length, 300))
 
-    if( damageByExploding > (bot.energy - 100 + resourceValue)) {
+    if ( damageByExploding.sum > (bot.energy + resourceValue) ) {
       bot.spawn(bestDirection, "mood" -> "Gathering")
       bot.explode(blastRadius)
     } else {
       bot.set("mood" -> "Gathering")
     }
-
   }
 
 
@@ -184,7 +187,7 @@ object ControlFunction {
 
 trait ViewAnalyzer{
   val directionValue: Array[Double]
-  val resourceValue: Int
+  val resourceValue: Double
   val entityXYs: Map[Char,List[XY]]
   def S = entityXYs.getOrElse('S', Nil)
   def m = entityXYs.getOrElse('m', Nil)
@@ -205,7 +208,7 @@ case class viewAnalyzerSlave(view: View) extends ViewAnalyzer{
     */
   def analyzeViewAsSlave(view: View) = {
     val directionValue = Array.ofDim[Double](8)
-    var resourceValue = 0
+    var resourceValue = 0.0
     var entityXYs = Map[Char, scala.collection.mutable.ListBuffer[XY]]()
     val cells = view.cells
     val cellCount = cells.length
@@ -233,13 +236,13 @@ case class viewAnalyzerSlave(view: View) extends ViewAnalyzer{
             -100 // to spread out mini-bots
 
           case 'B' => // good beast: valuable, but runs away
-            resourceValue += 200
+            resourceValue += 200/stepDistance
             if(stepDistance == 1) 600
             else if(stepDistance == 2) 400
             else (430 - stepDistance * 15).max(10)
 
           case 'P' => // good plant: less valuable, but does not run
-            resourceValue += 100
+            resourceValue += 100/stepDistance
             if(stepDistance == 1) 500
             else if(stepDistance == 2) 300
             else (320 - stepDistance * 10).max(10)
@@ -275,7 +278,7 @@ case class viewAnalyzerMaster(view: View) extends ViewAnalyzer {
     */
   def analyzeViewAsMaster(view: View) = {
     val directionValue = Array.ofDim[Double](8)
-    var resourceValue = 0
+    var resourceValue = 0.0
     var entityXYs = Map[Char, ListBuffer[XY]]()
 
     val cells = view.cells
@@ -296,11 +299,12 @@ case class viewAnalyzerMaster(view: View) extends ViewAnalyzer {
           case 'm' => // another master: not dangerous, but an obstacle
             if(stepDistance < 2) -1000 else 0
 
-          case 's' => // another slave
-            resourceValue += 150
-            if(stepDistance == 1) 500
-            else if(stepDistance == 2) 300
-            else (320 - stepDistance * 10).max(10)
+          case 's' => // another slave: valuable but can be dangerous, rather avoid
+            if(stepDistance < 3) -1000 else 0
+//            resourceValue += 150
+//            if(stepDistance == 1) 500
+//            else if(stepDistance == 2) 300
+//            else (320 - stepDistance * 10).max(10)
 
           case 'S' => // our own slave
             10
